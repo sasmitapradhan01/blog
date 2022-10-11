@@ -1,21 +1,29 @@
 package com.danvega.blog.model;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
+import org.springframework.data.relational.core.sql.In;
+
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Post {
 
+    @Id
     private Integer id;
     private String title;
     private String content;
     private LocalDateTime publishedOn;
     private LocalDateTime updatedOn;
-    // author
-    // comments
+    private AggregateReference<Author,Integer> author;
+    private Set<Comment> comments = new HashSet<>();
 
-    public Post(String title, String content){
+    public Post(String title, String content,AggregateReference<Author,Integer> author){
         this.title = title;
         this.content = content;
         this.publishedOn = LocalDateTime.now();
+        this.author = author;
     }
 
     public Integer getId() {
@@ -56,6 +64,28 @@ public class Post {
 
     public void setUpdatedOn(LocalDateTime updatedOn) {
         this.updatedOn = updatedOn;
+    }
+
+    public void setAuthor(AggregateReference<Author, Integer> author){
+        this.author = author;
+    }
+
+    public AggregateReference<Author, Integer> getAuthor() {
+        return author;
+    }
+
+    public Set<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public void addComment(Comment comment){
+        comments.add(comment);
+        comment.post = this;
+
     }
 
     @Override
